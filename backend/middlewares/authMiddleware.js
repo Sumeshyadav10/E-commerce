@@ -1,9 +1,11 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const ApiError = require("../utils/ApiError");
+
 
 const authMiddleware = async (req, res, next) => {
   const token = req.cookies.jwt;
-
+  // console.log("Token from cookie:", token); // Debugging line
   if (!token) {
     return res.status(401).json({ message: "Not authorized, no token" });
   }
@@ -28,11 +30,12 @@ const authorize = (...roles) => {
 
 
 const protect = async (req, res, next) => {
-  let token;
+  let token = req.cookies.jwt; // Extract token from cookies
+  // console.log("Token from cookie:", token); // Debugging line
 
-  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-      token = req.headers.authorization.split(" ")[1];
-  }
+  // if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+  //     token = req.headers.authorization.split(" ")[1];
+  // }
 
   if (!token) {
       return next(new ApiError(401, "Not authorized, no token"));
