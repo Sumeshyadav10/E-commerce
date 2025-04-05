@@ -15,6 +15,8 @@ const AppContent = () => {
       transition={{ duration: 0.5 }}
     >
       <HomePage />
+     
+     
     </motion.div>
   );
 };
@@ -24,7 +26,9 @@ const App = () => {
     <ThemeProvider>
       <AnimatePresence mode="wait">
         <AppContent />
+        
       </AnimatePresence>
+    
     </ThemeProvider>
   );
 };

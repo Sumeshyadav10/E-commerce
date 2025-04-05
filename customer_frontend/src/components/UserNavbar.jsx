@@ -13,12 +13,10 @@ const UserNavbar = () => {
   const { darkMode, toggleDarkMode } = useTheme();
 
   return (
-    <nav className={`px-6 py-4 flex items-center justify-between shadow-md transition-all duration-300
-      ${darkMode ? 'bg-[#0f172a] text-white' : 'bg-white text-black'}`}>
-      
+      <nav className={`sticky top-0 z-50 p-4 ${darkMode ? 'bg-gray-800 text-white' : 'bg-gray-100 text-black'} flex justify-between items-center h-16`}>      
       {/* Logo + Theme Toggle */}
       <div className="flex items-center space-x-4">
-        <img src="/voltvision images/images/logo_final.png" alt="VoltVision Logo" className="w-8 h-8" />
+        <img src="/voltvision-images/images/logo_final.png" alt="VoltVision Logo" className="w-8 h-8" />
         <span className="font-bold text-lg">VOLTVISION</span>
 
         {/* Theme Toggle Icon */}
