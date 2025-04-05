@@ -1,59 +1,65 @@
-import {
-    Mail, MapPin, Phone, Linkedin, Twitter, Youtube, Facebook, Instagram
-  } from "lucide-react";
-  
-  const Footer = () => {
-    return (
-      <footer className="bg-[#111827] text-gray-300 py-10 px-6 md:px-16">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
-          {/* Contact Info */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4 text-white">Contact Info</h2>
-            <ul className="space-y-2 text-sm">
-              <li className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-gray-400" />
-                <span>Address: VCET VASAI</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-gray-400" />
-                <span>TELEPHONE: +91-9998316913</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-gray-400" />
-                <span>Email: Info@VoltaVision.Com</span>
-              </li>
-            </ul>
-          </div>
-  
-          {/* Pages */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4 text-white">Pages</h2>
-            <ul className="space-y-2 text-sm">
-              <li className="hover:text-white cursor-pointer">Contact</li>
-              <li className="hover:text-white cursor-pointer">Shop</li>
-            </ul>
-          </div>
-  
-          {/* Social */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4 text-white">Social</h2>
-            <div className="flex gap-4">
-              <Linkedin className="w-5 h-5 hover:text-white cursor-pointer" />
-              <Twitter className="w-5 h-5 hover:text-white cursor-pointer" />
-              <Youtube className="w-5 h-5 hover:text-white cursor-pointer" />
-              <Facebook className="w-5 h-5 hover:text-white cursor-pointer" />
-              <Instagram className="w-5 h-5 hover:text-white cursor-pointer" />
-            </div>
+import React from 'react';
+import { Facebook, Instagram, Twitter, Mail } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+
+const Footer = () => {
+  const { darkMode } = useTheme();
+
+  return (
+    <footer className="bg-gray-100 text-gray-800 py-10 px-4 md:px-16">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+        {/* Company Info */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4">VoltVision</h3>
+          <p className="text-sm">
+            Powering innovation with smart electrical solutions. Trusted across industries for safety, performance, and sustainability.
+          </p>
+          <div className="flex space-x-4 mt-4">
+            <Facebook className="w-5 h-5 hover:text-blue-600 cursor-pointer" />
+            <Instagram className="w-5 h-5 hover:text-pink-500 cursor-pointer" />
+            <Twitter className="w-5 h-5 hover:text-sky-400 cursor-pointer" />
+            <Mail className="w-5 h-5 hover:text-red-500 cursor-pointer" />
           </div>
         </div>
-  
-        {/* Divider and copyright */}
-        <div className="border-t border-gray-700 mt-10 pt-4 text-center text-sm text-gray-500">
-          © 2024 All Rights Reserved | Volt Vision
+
+        {/* Quick Links */}
+        <div>
+          <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+          <ul className="space-y-2 text-sm">
+            <li className="hover:underline cursor-pointer">Home</li>
+            <li className="hover:underline cursor-pointer">About Us</li>
+            <li className="hover:underline cursor-pointer">Products</li>
+            <li className="hover:underline cursor-pointer">Contact</li>
+          </ul>
         </div>
-      </footer>
-    );
-  };
-  
-  export default Footer;
-  
+
+        {/* Categories */}
+        <div>
+          <h4 className="text-lg font-semibold mb-4">Categories</h4>
+          <ul className="space-y-2 text-sm">
+            <li className="hover:underline cursor-pointer">Household Wires</li>
+            <li className="hover:underline cursor-pointer">SwitchGear</li>
+            <li className="hover:underline cursor-pointer">Hand Tools</li>
+            <li className="hover:underline cursor-pointer">Solar Panel</li>
+          </ul>
+        </div>
+
+        {/* Contact Info */}
+        <div>
+          <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
+          <ul className="space-y-2 text-sm">
+            <li>Email: support@voltvision.com</li>
+            <li>Phone: +91-9876543210</li>
+            <li>Location: Mumbai, India</li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="mt-10 text-center text-xs border-t pt-4 border-gray-400">
+        &copy; {new Date().getFullYear()} VoltVision. All rights reserved.
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
