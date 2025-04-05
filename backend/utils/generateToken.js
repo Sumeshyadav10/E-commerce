@@ -15,3 +15,13 @@ const generateToken = (res, userId) => {
 };
 
 module.exports = generateToken;
+
+
+
+
+// Usage example in an Express route handler
+
+
+
+
+
