@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser"); // Import cookie-parser
+const cors = require("cors");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
@@ -11,6 +12,13 @@ const messageRoutes = require("./routes/messageRoutes");
 
 connectDB();
 const app = express();
+
+app.use(
+    cors({
+      origin: "http://localhost:5173", // Replace with your frontend URL
+      credentials: true, // Allow cookies to be sent with requests
+    })
+  );
 
 app.use(express.json()); // Parse JSON requests
 app.use(cookieParser()); // Enable cookie parsing

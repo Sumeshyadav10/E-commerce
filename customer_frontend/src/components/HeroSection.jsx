@@ -22,7 +22,7 @@ const HeroSection = () => {
       style={{ backgroundImage: "url('/voltvision-images/img/home3.jpg')" }}
     >
       {/* Dark overlay over background */}
-      <div className="absolute inset-0 bg-black bg-opacity-50 z-10" />
+      <div className="absolute inset-0 bg-black/50 z-10" />
 
       {/* Carousel image */}
       <div className="relative z-20 w-full h-full flex items-center justify-center">

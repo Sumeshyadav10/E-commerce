@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   FaSearch,
   FaHeart,
@@ -10,13 +10,16 @@ import {
 import { useTheme } from '../context/ThemeContext';
 import { Link, useLocation } from 'react-router-dom';
 import { useCartWishlist } from '../context/CartWishlistContext.jsx';
+import { useAuth } from "../context/AuthContext.jsx";
 
 const UserNavbar = () => {
   const { darkMode, toggleDarkMode } = useTheme();
   const { wishlistItems, cartItems } = useCartWishlist();
   const [showSearch, setShowSearch] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const dropdownRef = useRef(null); // Reference to the dropdown menu
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   const navLinks = [
     { name: 'Home', path: '/' },
@@ -24,6 +27,19 @@ const UserNavbar = () => {
     { name: 'Shop Now', path: '/shop' },
     { name: 'Contact Us', path: '/contact' },
   ];
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowProfileDropdown(false); // Close dropdown
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <nav
@@ -105,26 +121,56 @@ const UserNavbar = () => {
         />
         {showProfileDropdown && (
           <div
+            ref={dropdownRef} // Attach ref to the dropdown
             className={`absolute top-12 right-0 shadow-md p-2 rounded ${
-              darkMode ? 'bg-cyan-500 text-black' : 'bg-cyan-100 text-black'
+              darkMode ? "bg-cyan-500 text-black" : "bg-cyan-100 text-black"
             }`}
           >
-            <Link
-              to="/register"
-              className={`block px-4 py-2 rounded hover:bg-cyan-600 hover:text-white ${
-                darkMode ? 'text-black' : 'text-black'
-              }`}
-            >
-              Register
-            </Link>
-            <Link
-              to="/login"
-              className={`block px-4 py-2 rounded hover:bg-cyan-600 hover:text-white ${
-                darkMode ? 'text-black' : 'text-black'
-              }`}
-            >
-              Login
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  to="/help"
+                  onClick={() => setShowProfileDropdown(false)} // Close dropdown after selecting
+                  className={`block px-4 py-2 rounded hover:bg-cyan-600 hover:text-white ${
+                    darkMode ? "text-black" : "text-black"
+                  }`}
+                >
+                  Help
+                </Link>
+                <button
+                  onClick={() => {
+                    logout();
+                    setShowProfileDropdown(false); // Close dropdown after logout
+                  }}
+                  className={`block w-full text-left px-4 py-2 rounded hover:bg-cyan-600 hover:text-white ${
+                    darkMode ? "text-black" : "text-black"
+                  }`}
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/register"
+                  onClick={() => setShowProfileDropdown(false)} // Close dropdown after selecting
+                  className={`block px-4 py-2 rounded hover:bg-cyan-600 hover:text-white ${
+                    darkMode ? "text-black" : "text-black"
+                  }`}
+                >
+                  Register
+                </Link>
+                <Link
+                  to="/login"
+                  onClick={() => setShowProfileDropdown(false)} // Close dropdown after selecting
+                  className={`block px-4 py-2 rounded hover:bg-cyan-600 hover:text-white ${
+                    darkMode ? "text-black" : "text-black"
+                  }`}
+                >
+                  Login
+                </Link>
+              </>
+            )}
           </div>
         )}
       </div>
