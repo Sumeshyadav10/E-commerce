@@ -115,41 +115,54 @@ const getUserById = asyncHandler(async (req, res) => {
 // @desc    Update logged-in user
 // @route   PUT /api/users/update
 // @access  Private
-const updateUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
+const updateUser= asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
 
-  if (user) {
-    // If the email is changing, check if the new email already exists
-    if (req.body.email && req.body.email !== user.email) {
-      const emailExists = await User.findOne({ email: req.body.email });
-      if (emailExists) {
-        res.status(400);
-        throw new Error("Email already in use by another account");
-      }
-      user.email = req.body.email;
-    }
-
-    user.name = req.body.name || user.name;
-
-    if (req.body.password) {
-      user.password = req.body.password;
-    }
-
-    const updatedUser = await user.save();
-
-    generateToken(res, updatedUser._id);
-
-    res.json({
-      _id: updatedUser._id,
-      name: updatedUser.name,
-      email: updatedUser.email,
-      role: updatedUser.role,
-      isActive: updatedUser.isActive,
-    });
-  } else {
+  if (!user) {
     res.status(404);
     throw new Error("User not found");
   }
+
+  // Update name if provided
+  if (req.body.name) {
+    user.name = req.body.name;
+  }
+
+  // Update role if provided (e.g., 'admin', 'farmer', 'customer')
+  if (req.body.role) {
+    user.role = req.body.role;
+  }
+
+  // Update isActive status if provided
+  if (typeof req.body.isActive === "boolean") {
+    user.isActive = req.body.isActive;
+  }
+
+  // Handle safe email update
+  const newEmail = req.body.email?.trim().toLowerCase();
+  const currentEmail = user.email?.trim().toLowerCase();
+
+  if (newEmail && newEmail !== currentEmail) {
+    const existingUser = await User.findOne({ email: newEmail });
+
+    // If another user has this email, throw error
+    if (existingUser && existingUser._id.toString() !== user._id.toString()) {
+      res.status(400);
+      throw new Error("Email already in use by another account");
+    }
+
+    user.email = newEmail;
+  }
+
+  const updatedUser = await user.save();
+
+  res.json({
+    _id: updatedUser._id,
+    name: updatedUser.name,
+    email: updatedUser.email,
+    role: updatedUser.role,
+    isActive: updatedUser.isActive,
+  });
 });
 
 // @desc    Delete user
