@@ -6,36 +6,42 @@ import apiError from "../utils/apiError.js";
 // @desc    Create new message
 // @route   POST /api/messages
 // @access  Private
-const createMessage = asyncHandler(async (req, res) => {
-  const { recipient, subject, content, attachments, priority } = req.body;
+// const createMessage = asyncHandler(async (req, res) => {
+//   const { recipient, subject, content, attachments, priority } = req.body;
 
-  const message = new Message({
-    sender: req.user._id,
-    recipient,
-    subject,
-    content,
-    attachments,
-    priority,
-  });
+//   const message = new Message({
+//     sender: req.user._id,
+//     recipient,
+//     subject,
+//     content,
+//     attachments,
+//     priority,
+//   });
 
-  const createdMessage = await message.save();
-  res.status(201).json(createdMessage);
-});
+//   const createdMessage = await message.save();
+//   res.status(201).json(createdMessage);
+// });
 
-const sendMessage = asyncHandler(async (req, res, next) => {
-  const { message } = req.body;
-  const customerId = req.user._id; // Logged-in user
+const sendMessage = asyncHandler(async (req, res) => {
+  const { subject, content } = req.body;
 
-  if (!message) {
-      throw new apiError(400, "Message cannot be empty");
+  if (!content) {
+    res.status(400);
+    throw new Error("Message content cannot be empty");
   }
 
+  // Handle attachments if any
+  const attachments = req.files ? req.files.map((file) => file.path) : [];
+
+  // Create a new message
   const newMessage = await Message.create({
-      customer: customerId,
-      message
+    customer: req.user._id,
+    message: content,
+    subject,
+    attachments, // Save attachment URLs
   });
 
-  res.status(201).json(new ApiResponse(201, "Message sent successfully", newMessage));
+  res.status(201).json({ message: "Message sent successfully", data: newMessage });
 });
 // @desc    Get all messages for logged in user
 // @route   GET /api/messages
@@ -133,7 +139,7 @@ const getUnreadCount = asyncHandler(async (req, res) => {
 });
 
 export {
-  createMessage,
+  // createMessage,
   sendMessage,
   getMessages,
   getMessageById,
