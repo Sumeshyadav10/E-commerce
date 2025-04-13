@@ -1,8 +1,8 @@
 import axios from "axios";
 
-// const API_URL = "http://localhost:5000/api";
+const API_URL = "http://localhost:5000/api";
 
-const API_URL = "https://admin-panel-5rac.onrender.com/api";
+// const API_URL = "https://admin-panel-5rac.onrender.com/api";
 
 // Create axios instance with default config
 const api = axios.create({
@@ -32,13 +32,13 @@ api.interceptors.request.use(
 // Auth APIs
 export const login = (email, password) =>
   api.post("/users/login", { email, password });
-export const register = (userData) => api.post("/users", userData);
+export const register = (userData) => api.post("/users/register", userData);
 export const logout = () => api.post("/users/logout");
 
 // User APIs
-export const getUsers = () => api.get("/users");
+export const getUsers = () => api.get("/users/all");
 export const getUserById = (id) => api.get(`/users/${id}`);
-export const updateUser = (id, userData) => api.put(`/users/${id}`, userData);
+export const updateUser = (id, userData) => api.patch(`/users/${id}`, userData);
 export const deleteUser = (id) => api.delete(`/users/${id}`);
 
 // Product APIs

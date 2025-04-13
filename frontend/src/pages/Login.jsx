@@ -11,18 +11,20 @@ const Login = () => {
   const location = useLocation();
   const { login } = useAuth();
 
+  // Redirect to the intended page or homepage after login
   const from = location.state?.from?.pathname || "/";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
     try {
-      await login(email, password);
+      await login({ email, password }); // Pass email and password as an object
       toast.success("Login successful!");
-      navigate(from, { replace: true });
+      console.log("Login successful, navigating to:", from);
+      navigate("/"); // Redirect to the intended page
     } catch (error) {
-      toast.error(error.message || "Login failed");
+      toast.error(error.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }

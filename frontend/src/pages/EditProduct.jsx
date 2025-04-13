@@ -178,11 +178,14 @@ const EditProduct = () => {
                 onChange={handleChange}
                 className="w-full px-4 py-2 rounded-md border border-gray-300 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               >
-                <option value="">Select a category</option>
+               <option value="">Select a category</option>
                 <option value="solarpanel">Solar Panel</option>
                 <option value="household">Household</option>
                 <option value="switchgear">Switchgear</option>
                 <option value="handtools">Hand Tools</option>
+                <option value="Industrial-cables">Industry-cables</option>
+                <option value="Powertools">Power Tools</option>
+                <option value="circuit-protectors">Circuit Protectors</option>
               </select>
             </div>
 

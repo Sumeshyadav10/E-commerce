@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
  
     const fetchUser = async () => {
       try {
-        const response = await axiosInstance.get("/users/"); // Adjust endpoint as needed
+        const response = await axiosInstance.get("/users/me"); // Adjust endpoint as needed
         setUser(response.data);
       } catch (error) {
         console.error("Error fetching user:", error);

@@ -122,8 +122,15 @@ const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
 
   if (product) {
-    // Delete image from Cloudinary if exists
-    if (product.image) {
+    // Check if the product has images
+    if (product.image && Array.isArray(product.image)) {
+      // Loop through each image and delete it from Cloudinary
+      for (const imageUrl of product.image) {
+        const publicId = imageUrl.split("/").pop().split(".")[0];
+        await deleteImage(publicId);
+      }
+    } else if (product.image) {
+      // If `product.image` is a single string (not an array)
       const publicId = product.image.split("/").pop().split(".")[0];
       await deleteImage(publicId);
     }

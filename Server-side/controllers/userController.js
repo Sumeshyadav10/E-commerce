@@ -46,12 +46,15 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log("Login attempt with email:", email); // Debugging line
 
     const user = await User.findOne({ email });
+    console.log("User found:", user); // Debugging line
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
     const isMatch = await user.matchPassword(password);
-    if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+    if (!isMatch)
+      return res.status(401).json({ message: "Invalid credentials" });
 
     generateToken(res, user._id); // Set cookie with JWT
 
@@ -74,14 +77,23 @@ const getUsers = asyncHandler(async (req, res) => {
   res.json(users);
 });
 
-const getAllUsers = async (req, res) => {
-    try {
-      const users = await User.find().select("-password"); // Exclude password field
-      res.json(users);
-    } catch (error) {
-      res.status(500).json({ message: "Server Error" });
+// @desc    Get all users
+// @route   GET /api/users/all
+// @access  Private/Admin
+const getAllUsers = asyncHandler(async (req, res) => {
+  try {
+    // Ensure only admins can access this route
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(403).json({ message: "Access denied" });
     }
-  };
+
+    const users = await User.find().select("-password"); // Exclude password field
+    res.status(200).json(users);
+  } catch (error) {
+    console.error("Error fetching users:", error.message);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
 
 // @desc    Get user by ID
 // @route   GET /api/users/:id
@@ -100,15 +112,24 @@ const getUserById = asyncHandler(async (req, res) => {
 // @desc    Update user
 // @route   PUT /api/users/:id
 // @access  Private/Admin
+// @desc    Update logged-in user
+// @route   PUT /api/users/update
+// @access  Private
 const updateUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(req.user._id);
 
   if (user) {
+    // If the email is changing, check if the new email already exists
+    if (req.body.email && req.body.email !== user.email) {
+      const emailExists = await User.findOne({ email: req.body.email });
+      if (emailExists) {
+        res.status(400);
+        throw new Error("Email already in use by another account");
+      }
+      user.email = req.body.email;
+    }
+
     user.name = req.body.name || user.name;
-    user.email = req.body.email || user.email;
-    user.role = req.body.role || user.role;
-    user.isActive =
-      req.body.isActive !== undefined ? req.body.isActive : user.isActive;
 
     if (req.body.password) {
       user.password = req.body.password;
@@ -116,13 +137,14 @@ const updateUser = asyncHandler(async (req, res) => {
 
     const updatedUser = await user.save();
 
+    generateToken(res, updatedUser._id);
+
     res.json({
       _id: updatedUser._id,
       name: updatedUser.name,
       email: updatedUser.email,
       role: updatedUser.role,
       isActive: updatedUser.isActive,
-      token: generateToken(updatedUser._id),
     });
   } else {
     res.status(404);

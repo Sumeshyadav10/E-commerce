@@ -7,7 +7,7 @@ import {
   deleteProduct,
   createProductReview,
 } from "../controllers/productController.js";
-import { authenticateToken, admin } from "../middleware/authMiddleware.js";
+import {authMiddleware, admin } from "../middleware/authMiddleware.js";
 import upload from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
@@ -31,7 +31,7 @@ router
   .route("/")
   .get(getProducts)
   .post(
-    authenticateToken,
+    authMiddleware,
     admin,
     upload.fields([
       { name: "image01", maxCount: 1 },
@@ -46,7 +46,7 @@ router
   .route("/:id")
   .get(getProductById)
   .put(
-    authenticateToken,
+    authMiddleware,
     admin,
     upload.fields([
       { name: "image01", maxCount: 1 },
@@ -56,8 +56,8 @@ router
     handleUploadError,
     updateProduct
   )
-  .delete(authenticateToken, admin, deleteProduct);
+  .delete(authMiddleware, admin, deleteProduct);
 
-router.route("/:id/reviews").post(authenticateToken, createProductReview);
+router.route("/:id/reviews").post(authMiddleware, createProductReview);
 
 export default router;

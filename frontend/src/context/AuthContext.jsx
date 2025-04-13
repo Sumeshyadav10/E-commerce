@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { login as loginApi, logout as logoutApi } from "../services/api";
+import axiosInstance from "../api/axiosInstance"; // Adjust the import based on your project structure
 
 const AuthContext = createContext();
 
@@ -16,26 +17,27 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (credentials) => {
     try {
-      const { data } = await loginApi(email, password);
-      setUser(data);
-      localStorage.setItem("user", JSON.stringify(data));
-      localStorage.setItem("token", data.token);
-      return data;
+      const response = await axiosInstance.post("/users/login", credentials);
+      setUser(response.data); // Update user state
+      localStorage.setItem("user", JSON.stringify(response.data)); // Persist user data
     } catch (error) {
-      throw error.response?.data?.message || "Login failed";
+      console.error(
+        "Error logging in:",
+        error.response?.data?.message || error.message
+      );
     }
   };
 
   const logout = async () => {
     try {
-      await logoutApi();
-      setUser(null);
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
+      await axiosInstance.post("/users/logout", {}, { withCredentials: true });
+      setUser(null); // Clear user data
+      console.log("Logged out successfully");
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error("Error logging out:", error);
+      setUser(null); // Still log out client-side even if server fails
     }
   };
 

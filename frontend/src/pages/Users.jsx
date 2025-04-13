@@ -119,6 +119,7 @@ const Users = () => {
                     >
                       <option value="admin">Admin</option>
                       <option value="superadmin">Super Admin</option>
+                      <option value="customer">customer</option>
                     </select>
                   ) : (
                     user.role

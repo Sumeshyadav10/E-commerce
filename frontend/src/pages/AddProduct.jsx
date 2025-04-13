@@ -139,6 +139,9 @@ const AddProduct = () => {
                 <option value="household">Household</option>
                 <option value="switchgear">Switchgear</option>
                 <option value="handtools">Hand Tools</option>
+                <option value="Industrial-cables">Industry-cables</option>
+                <option value="Powertools">Power Tools</option>
+                <option value="circuit-protectors">Circuit Protectors</option>
               </select>
             </div>
 
