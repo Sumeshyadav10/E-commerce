@@ -1,27 +1,9 @@
 import asyncHandler from "express-async-handler";
 import Message from "../models/messageModel.js";
-import ApiResponse from "../utils/apiResponse.js";
-import apiError from "../utils/apiError.js";
 
-// @desc    Create new message
+// @desc    Send a new message
 // @route   POST /api/messages
 // @access  Private
-// const createMessage = asyncHandler(async (req, res) => {
-//   const { recipient, subject, content, attachments, priority } = req.body;
-
-//   const message = new Message({
-//     sender: req.user._id,
-//     recipient,
-//     subject,
-//     content,
-//     attachments,
-//     priority,
-//   });
-
-//   const createdMessage = await message.save();
-//   res.status(201).json(createdMessage);
-// });
-
 const sendMessage = asyncHandler(async (req, res) => {
   const { subject, content } = req.body;
 
@@ -43,19 +25,32 @@ const sendMessage = asyncHandler(async (req, res) => {
 
   res.status(201).json({ message: "Message sent successfully", data: newMessage });
 });
-// @desc    Get all messages for logged in user
+
+// @desc    Get all messages for logged-in user
+// @route   GET /api/messages
+// @access  Private
+// @desc    Get all messages for logged-in user
 // @route   GET /api/messages
 // @access  Private
 const getMessages = asyncHandler(async (req, res) => {
-  const messages = await Message.find({
-    $or: [{ sender: req.user._id }, { recipient: req.user._id }],
-  })
-    .populate("sender", "name email")
-    .populate("recipient", "name email")
-    .sort("-createdAt");
+  const userRole = req.user.role;
 
-  res.json(messages);
+  if (userRole !== "admin") {
+    res.status(403);
+    throw new Error("Not authorized to view all messages");
+  }
+
+  // Fetch all messages from customers only
+  const messages = await Message.find({ customer: { $exists: true, $ne: null } })
+    .sort({ createdAt: -1 })
+    .populate("customer", "name email");
+
+  res.status(200).json({
+    message: "All customer messages fetched successfully",
+    data: messages,
+  });
 });
+
 
 // @desc    Get message by ID
 // @route   GET /api/messages/:id
@@ -68,13 +63,17 @@ const getMessageById = asyncHandler(async (req, res) => {
   if (message) {
     // Mark message as read if recipient is viewing
     if (
+      message.recipient &&
       message.recipient._id.toString() === req.user._id.toString() &&
       !message.isRead
     ) {
       message.isRead = true;
       await message.save();
     }
-    res.json(message);
+    res.json({
+      message: "Message retrieved successfully",
+      data: message,
+    });
   } else {
     res.status(404);
     throw new Error("Message not found");
@@ -88,6 +87,7 @@ const updateMessage = asyncHandler(async (req, res) => {
   const message = await Message.findById(req.params.id);
 
   if (message) {
+    // Update fields if provided
     message.subject = req.body.subject || message.subject;
     message.content = req.body.content || message.content;
     message.attachments = req.body.attachments || message.attachments;
@@ -96,7 +96,10 @@ const updateMessage = asyncHandler(async (req, res) => {
       req.body.isRead !== undefined ? req.body.isRead : message.isRead;
 
     const updatedMessage = await message.save();
-    res.json(updatedMessage);
+    res.json({
+      message: "Message updated successfully",
+      data: updatedMessage,
+    });
   } else {
     res.status(404);
     throw new Error("Message not found");
@@ -113,10 +116,10 @@ const deleteMessage = asyncHandler(async (req, res) => {
     // Only allow sender or recipient to delete
     if (
       message.sender.toString() === req.user._id.toString() ||
-      message.recipient.toString() === req.user._id.toString()
+      (message.recipient && message.recipient.toString() === req.user._id.toString())
     ) {
       await message.deleteOne();
-      res.json({ message: "Message removed" });
+      res.json({ message: "Message removed successfully" });
     } else {
       res.status(401);
       throw new Error("Not authorized to delete this message");
@@ -135,11 +138,13 @@ const getUnreadCount = asyncHandler(async (req, res) => {
     recipient: req.user._id,
     isRead: false,
   });
-  res.json({ count });
+  res.json({
+    message: "Unread message count retrieved successfully",
+    count,
+  });
 });
 
 export {
-  // createMessage,
   sendMessage,
   getMessages,
   getMessageById,

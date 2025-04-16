@@ -7,10 +7,9 @@ import {
   EyeIcon,
   EyeSlashIcon,
   ShieldCheckIcon,
-  ArrowLeftIcon,
 } from "@heroicons/react/24/outline";
 import toast from "react-hot-toast";
-import { creatadmin } from "../services/api";
+import axiosInstance from "../api/axiosInstance";
 
 const CreateAdmin = () => {
   const navigate = useNavigate();
@@ -19,7 +18,7 @@ const CreateAdmin = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "admin",
+    role: "admin", // Default role for admin creation
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -44,36 +43,30 @@ const CreateAdmin = () => {
     setLoading(true);
 
     try {
-      const response = await creatadmin(formData);
-      console.log(response);
+      // Send a POST request to the `/api/users` endpoint
+      const response = await axiosInstance.post("/users", {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role, // Send the role as part of the request
+      });
+
       if (response.status === 201) {
         toast.success("Admin created successfully!");
-        navigate("/users");
+        navigate("/users"); // Redirect to the users list page
       } else {
-        toast.error("Failed to create admin");
+        toast.error(response.data.message || "Failed to create admin");
       }
     } catch (error) {
-      toast.error("Failed to create admin");
+      toast.error(error.response?.data?.message || "Failed to create admin");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 ">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-2xl mx-auto">
-        {/* Header with Back Button */}
-        {/* <div className="mb-8">
-          <button
-            onClick={() => navigate('/users')}
-            className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-          >
-            <ArrowLeftIcon className="h-5 w-5 mr-2" />
-            Back to Users
-          </button>
-        </div> */}
-
-        {/* Main Card */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
           <div className="flex items-center justify-center mb-8">
             <div className="bg-indigo-100 dark:bg-indigo-900 rounded-full p-3">
@@ -125,29 +118,6 @@ const CreateAdmin = () => {
                   className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   placeholder="Enter your email"
                 />
-              </div>
-            </div>
-
-            {/* Role Selection */}
-            <div className="relative">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
-                Role
-              </label>
-              <div className="relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <ShieldCheckIcon className="h-5 w-5 text-gray-400" />
-                </div>
-                <select
-                  name="role"
-                  required
-                  value={formData.role}
-                  onChange={handleChange}
-                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                >
-                  <option value="Admin">Admin</option>
-                  <option value="Super Admin">Super Admin</option>
-                  <option value="Editor">Editor</option>
-                </select>
               </div>
             </div>
 
@@ -231,14 +201,7 @@ const CreateAdmin = () => {
                 disabled={loading}
                 className="px-4 py-2.5 border border-transparent rounded-lg text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {loading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="w-5 h-5 border-t-2 border-b-2 border-white rounded-full animate-spin mr-2" />
-                    Creating...
-                  </div>
-                ) : (
-                  "Create Admin"
-                )}
+                {loading ? "Creating..." : "Create Admin"}
               </button>
             </div>
           </form>
