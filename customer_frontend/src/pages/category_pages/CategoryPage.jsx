@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
 import axiosInstance from "../../api/axiosInstance";
-import ProductCard from "../../components/ProductCard"; // ✅ Import your new component
+import ProductCard from "../../components/ProductCard";
+import { Loader2 } from "lucide-react";
 
 const CategoryPage = () => {
   const { category } = useParams();
@@ -15,10 +16,10 @@ const CategoryPage = () => {
       try {
         const response = await axiosInstance.get(`/products/category/${category}`);
         setProducts(response.data);
-        setLoading(false);
       } catch (error) {
         console.error("Error fetching products:", error);
         setProducts([]);
+      } finally {
         setLoading(false);
       }
     };
@@ -26,24 +27,33 @@ const CategoryPage = () => {
     fetchProducts();
   }, [category]);
 
-  if (loading) return <div className="text-center mt-10">Loading...</div>;
-
   return (
     <div
-      className={`min-h-screen px-4 py-10 ${
-        darkMode ? "bg-[#121212] text-white" : "bg-gray-100 text-gray-900"
+      className={`min-h-screen px-6 py-10 transition-colors duration-300 ${
+        darkMode ? "bg-[#0f0f0f] text-white" : "bg-white text-gray-900"
       }`}
     >
-      <h1 className="text-3xl font-bold mb-6 text-center capitalize">{category}</h1>
-      {products.length === 0 ? (
-        <p className="text-center text-lg">No products found in this category.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {products.map((product) => (
-            <ProductCard key={product._id} product={product} darkMode={darkMode} />
-          ))}
-        </div>
-      )}
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-4xl font-extrabold text-center mb-10 capitalize tracking-wide">
+          {category}
+        </h1>
+
+        {loading ? (
+          <div className="flex justify-center items-center mt-20">
+            <Loader2 className="animate-spin w-10 h-10 text-gray-500" />
+          </div>
+        ) : products.length === 0 ? (
+          <p className="text-center text-lg text-gray-500">
+            No products found in this category.
+          </p>
+        ) : (
+          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {products.map((product) => (
+              <ProductCard key={product._id} product={product} darkMode={darkMode} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

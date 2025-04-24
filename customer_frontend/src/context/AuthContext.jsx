@@ -1,38 +1,38 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axiosInstance from "../api/axiosInstance";
 import toast from "react-hot-toast";
-
+import { useCartWishlist } from "./CartWishlistContext"; // Import the context
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // Store user data
   const [loading, setLoading] = useState(true);
+  const { fetchCartAndWishlist } = useCartWishlist();
 
   // Fetch user data on initial load
- 
-    const fetchUser = async () => {
-      try {
-        const response = await axiosInstance.get("/users/me"); // Adjust endpoint as needed
-        setUser(response.data);
-      } catch (error) {
-        console.error("Error fetching user:", error);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-   
+  const fetchUser = async () => {
+    try {
+      const response = await axiosInstance.get("/users/me"); // Adjust endpoint as needed
+      setUser(response.data);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const login = async (credentials) => {
     try {
-      await axiosInstance.post("/users/login", credentials); // Adjust endpoint as needed
-      await fetchUser(); // Fetch the user data again
+      await axiosInstance.post("/users/login", credentials);
+      await fetchCartAndWishlist(); // Fetch cart and wishlist
+      await fetchUser(); // Fetch user data after login
       console.log("Logged in successfully");
-      toast.success("Login successful!"); // Show success notification
+      toast.success("Login successful!");
     } catch (error) {
       console.error("Error logging in:", error);
-      toast.error("Login failed!"); // Show error notification
+      toast.error("Login failed!");
     }
   };
 
@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
       toast.success("Logout successful!"); // Show success notification
     } catch (error) {
       console.error("Error logging out:", error);
-      toast.error("Logout failed!"); // Show error notification 
+      toast.error("Logout failed!"); // Show error notification
       setUser(null); // Still log out client-side even if server fails
     }
   };

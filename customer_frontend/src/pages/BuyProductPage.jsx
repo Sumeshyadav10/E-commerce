@@ -63,10 +63,30 @@ const BuyProductPage = () => {
     if (step > 1) setStep(step - 1);
   };
 
-  const handlePlaceOrder = () => {
-    // Add logic to save order details and navigate to confirmation page
-    alert("Order placed successfully!");
-    navigate("/");
+  const handlePlaceOrder = async () => {
+    try {
+      const orderDetails = {
+        orderItems: cartItems.map((item) => ({
+          name: item.name,
+          quantity: item.quantity || 1,
+          image: item.image[0],
+          price: item.price,
+          product: item._id,
+        })),
+        paymentMethod,
+        itemsPrice: cartItems.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0),
+        shippingPrice: 50, // Example shipping price
+        totalPrice: cartItems.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0) + 50,
+      };
+  
+      const { data } = await axiosInstance.post("/orders", orderDetails);
+      console.log("Order placed successfully:", data);
+  
+      // Redirect to the Orders page
+      navigate("/orders");
+    } catch (error) {
+      console.error("Error placing order:", error.response?.data?.message || error.message);
+    }
   };
 
   return (

@@ -8,7 +8,7 @@ const userSchema = mongoose.Schema(
     password: { type: String, required: true },
     role: {
       type: String,
-      enum: ["admin", "customer","superadmin"],
+      enum: ["admin", "customer", "superadmin"],
       default: "customer",
     },
     isActive: { type: Boolean, default: true },
@@ -20,6 +20,26 @@ const userSchema = mongoose.Schema(
       country: { type: String, required: true },
     },
     phoneNumber: { type: String },
+    cart: [
+      {
+        product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        quantity: { type: Number, default: 1 },
+        name: { type: String }, // Store product name
+        price: { type: Number }, // Store product price
+        image: [{ type: String }], // Store product images
+        dimensions: { type: String }, // Store product dimensions
+      },
+    ],
+    
+    wishlist: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+        },
+      ],
+      default: [], // Default to an empty array
+    },
   },
   { timestamps: true }
 );

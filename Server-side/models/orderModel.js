@@ -1,7 +1,14 @@
 import mongoose from "mongoose";
 
+import { v4 as uuidv4 } from "uuid"; // Import UUID library
+
 const orderSchema = new mongoose.Schema(
   {
+    orderID: {
+      type: String,
+      unique: true, // Ensure uniqueness
+      default: () => uuidv4(), 
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
@@ -30,18 +37,7 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    paymentResult: {
-      id: { type: String },
-      status: { type: String },
-      update_time: { type: String },
-      email_address: { type: String },
-    },
     itemsPrice: {
-      type: Number,
-      required: true,
-      default: 0.0,
-    },
-    taxPrice: {
       type: Number,
       required: true,
       default: 0.0,

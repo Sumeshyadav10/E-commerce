@@ -7,27 +7,32 @@ import {
   getMyOrders,
   getOrders,
   updateOrderStatus,
+  cancelOrder,
+
 } from "../controllers/orderController.js";
-import { authenticateToken, admin } from "../middleware/authMiddleware.js";
+import { authMiddleware, admin } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router
   .route("/")
-  .post(authenticateToken, createOrder)
-  .get(authenticateToken, admin, getOrders);
+  .post(authMiddleware, createOrder)
+  .get(authMiddleware, admin, getOrders);
 
-router.route("/myorders").get(authenticateToken, getMyOrders);
+router.route("/myorders").get(authMiddleware, getMyOrders);
 
 router
   .route("/:id")
-  .get(authenticateToken, getOrderById)
-  .put(authenticateToken, admin, updateOrderStatus);
+  .get(authMiddleware, getOrderById)
+  .put(authMiddleware, admin, updateOrderStatus);
 
-router.route("/:id/pay").put(authenticateToken, updateOrderToPaid);
+router.route("/:id/pay").put(authMiddleware, updateOrderToPaid);
+router.delete("/:id", authMiddleware, cancelOrder);
 
 router
   .route("/:id/deliver")
-  .put(authenticateToken, admin, updateOrderToDelivered);
+  .put(authMiddleware, admin, updateOrderToDelivered)
+
+
 
 export default router;
