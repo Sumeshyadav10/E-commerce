@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createProduct } from "../services/api";
+import { createProduct, getsummary } from "../services/api";
 import toast from "react-hot-toast";
 
 const AddProduct = () => {
   const navigate = useNavigate();
+  const [summaries, setSummaries] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -34,6 +35,36 @@ const AddProduct = () => {
     }));
   };
 
+  const getSummaries = async () => {
+    try {
+      if (
+        !formData.name ||
+        !formData.dimensions ||
+        !formData.price ||
+        !formData.category
+      ) {
+        toast.error("Enter other details first");
+        return;
+      }
+
+      const response = await getsummary(
+        formData.name,
+        formData.price,
+        formData.dimensions,
+        formData.category
+      );
+      console.log(response);
+      setSummaries(response.data.summaries || []); // Assuming the backend response has a "summaries" array
+      setFormData((prev) => ({
+        ...prev,
+        description: response.data.summary || "", // Assuming the backend response has a "summary"
+      }));
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch summary");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -51,12 +82,12 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto p-6 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg">
       <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-white mb-8">
         ADD PRODUCT
       </h1>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Product Name */}
@@ -91,7 +122,7 @@ const AddProduct = () => {
               />
             </div>
 
-            {/* Details */}
+            {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Description (required)
@@ -105,6 +136,17 @@ const AddProduct = () => {
                 rows={4}
                 className="w-full px-4 py-2 rounded-md border border-gray-300 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
+            </div>
+
+            {/* Get Summary Button */}
+            <div>
+              <button
+                type="button"
+                onClick={getSummaries}
+                className="w-full mt-4 py-2 px-4 rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-500 dark:hover:bg-blue-600"
+              >
+                Get Summary
+              </button>
             </div>
 
             {/* Dimensions */}
