@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext"; // Import AuthContext
+import toast from "react-hot-toast"; // Import toast for notifications
 
 const LoginPage = () => {
   const { darkMode } = useTheme();
@@ -24,9 +25,11 @@ const LoginPage = () => {
     setError(""); // Clear previous error
     try {
       await login(formData); // Use login function from AuthContext
+      toast.success("Login successful!"); // Show success notification
       navigate("/"); // Redirect to homepage after successful login
     } catch (err) {
       console.error("Login error:", err.message);
+      toast.error("Login failed!"); // Show error notification  
       setError(err.response?.data?.message || "An error occurred");
     }
   };
