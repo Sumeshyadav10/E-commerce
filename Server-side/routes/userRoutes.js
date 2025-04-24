@@ -3,6 +3,7 @@ import {
   registerUser,
   loginUser,
   logoutUser,
+  getLoggedInUser,
   getUsers,
   getAllUsers,
   getUserById,
@@ -29,6 +30,7 @@ router.post("/logout", authMiddleware, logoutUser);
 router.get("/all", authMiddleware, getAllUsers); // Get all users
 router.get("/me", authMiddleware, getUsers);
 router.put("/address", authMiddleware, updateAddress);
+router.get("/profile", authMiddleware, getLoggedInUser); // Get user profile
 
 
 router

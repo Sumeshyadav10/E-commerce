@@ -179,12 +179,31 @@ const updateAddress = asyncHandler(async (req, res) => {
   user.address = { address, city, postalCode, country };
 
   const updatedUser = await user.save();
-
+  console.log("Updated user address:", updatedUser.address); // Debugging line
   res.json({
     _id: updatedUser._id,
     name: updatedUser.name,
     email: updatedUser.email,
     address: updatedUser.address,
+  });
+});
+
+const getLoggedInUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).select("-password"); // Exclude password
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    isActive: user.isActive,
+    address: user.address,
+    phoneNumber: user.phoneNumber,
   });
 });
 
@@ -224,6 +243,7 @@ const getProfile = asyncHandler(async (req, res) => {
 export {
   registerUser,
   loginUser,
+  getLoggedInUser,
   getUsers,
   getAllUsers,
   getUserById,
