@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
 import generateToken from "../utils/generateToken.js";
+import Product from "../models/productModel.js";
 
 // @desc    Register a new user
 // @route   POST /api/users
@@ -189,7 +190,10 @@ const updateAddress = asyncHandler(async (req, res) => {
 });
 
 const getLoggedInUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id).select("-password"); // Exclude password
+  const user = await User.findById(req.user._id)
+    .select("-password")
+    .populate("cart.product", "name price image dimensions")
+    .populate("wishlist", "name price image");
 
   if (!user) {
     res.status(404);
@@ -204,9 +208,10 @@ const getLoggedInUser = asyncHandler(async (req, res) => {
     isActive: user.isActive,
     address: user.address,
     phoneNumber: user.phoneNumber,
+    cart: user.cart || [], // Default to an empty array if cart is undefined
+    wishlist: user.wishlist || [], // Default to an empty array if wishlist is undefined
   });
 });
-
 // @desc    Delete user
 // @route   DELETE /api/users/:id
 // @access  Private/Admin
@@ -240,6 +245,88 @@ const getProfile = asyncHandler(async (req, res) => {
   res.json(user);
 });
 
+const updateCart = async (req, res) => {
+  const { productId, quantity } = req.body;
+
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      res.status(404);
+      throw new Error("User not found");
+    }
+
+    // Fetch product details from the Product model
+    const product = await Product.findById(productId).select("name price image dimensions");
+
+    if (!product) {
+      res.status(404);
+      throw new Error("Product not found");
+    }
+
+    // Check if the product already exists in the cart
+    const existingItem = user.cart.find((item) => item.product.toString() === productId);
+
+    if (existingItem) {
+      // Update the quantity of the existing item
+      existingItem.quantity = quantity;
+    } else {
+      // Add the product to the cart with all details
+      user.cart.push({
+        product: productId,
+        quantity,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        dimensions: product.dimensions,
+      });
+    }
+
+    await user.save();
+
+    // Populate the cart with product details before sending the response
+    const populatedUser = await user.populate("cart.product", "name price image dimensions");
+    res.json(populatedUser.cart);
+  } catch (err) {
+    console.error("Error updating cart:", err.message);
+    res.status(500).json({ message: "Failed to update cart" });
+  }
+};
+
+// Remove item from cart
+const removeFromCart = async (req, res) => {
+  const { productId } = req.body;
+
+  try {
+    const user = await User.findById(req.user._id);
+
+    user.cart = user.cart.filter(
+      (item) => item.product.toString() !== productId
+    );
+
+    await user.save();
+    const populatedUser = await user.populate("cart.product");
+    res.json(populatedUser.cart);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to remove item from cart" });
+  }
+};
+const updateWishlist = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  const { wishlist } = req.body;
+
+  user.wishlist = wishlist; // Update the wishlist
+  await user.save();
+
+  res.status(200).json({ message: "Wishlist updated successfully", wishlist: user.wishlist });
+});
+
 export {
   registerUser,
   loginUser,
@@ -252,4 +339,7 @@ export {
   deleteUser,
   logoutUser,
   getProfile,
+  updateCart,
+  removeFromCart,
+  updateWishlist,
 };

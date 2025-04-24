@@ -10,6 +10,9 @@ import {
   updateUser,
   updateAddress,
   deleteUser,
+  updateCart,
+  removeFromCart,
+  updateWishlist,
 } from "../controllers/userController.js";
 import {
   authenticateToken,
@@ -31,6 +34,11 @@ router.get("/all", authMiddleware, getAllUsers); // Get all users
 router.get("/me", authMiddleware, getUsers);
 router.put("/address", authMiddleware, updateAddress);
 router.get("/profile", authMiddleware, getLoggedInUser); // Get user profile
+router.put("/cart", authMiddleware, updateCart);
+router.put("/cart/remove", authMiddleware, removeFromCart);
+
+router.put("/wishlist", authMiddleware, updateWishlist);
+
 
 
 router

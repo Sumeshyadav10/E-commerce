@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext'; // Custom theme hook
 
 const categories = [
-  { name: 'Household Wires', slug: 'household-wires', image: '/voltvision-images/images/wire.png' },
+  { name: 'Household Wires', slug: 'household', image: '/voltvision-images/images/wire.png' },
   { name: 'Industrial cables', slug: 'Industrial-cables', image: '/voltvision-images/images/cables.png' },
   { name: 'SwitchGear', slug: 'switchgear', image: '/voltvision-images/images/light-switch.png' },
   { name: 'Circuit protectors', slug: 'circuit-protectors', image: '/voltvision-images/images/breaker.png' },
-  { name: 'Hand Tools', slug: 'hand-tools', image: '/voltvision-images/images/screwdriver.png' },
-  { name: 'Solar Panel', slug: 'solar-panel', image: '/voltvision-images/images/solar-panel.png' },
+  { name: 'Hand Tools', slug: 'handtools', image: '/voltvision-images/images/screwdriver.png' },
+  { name: 'Solar Panel', slug: 'solarpanel', image: '/voltvision-images/images/solar-panel.png' },
   { name: 'Power Tools', slug: 'Powertools', image: '/voltvision-images/images/drill.png' },
 ];
 

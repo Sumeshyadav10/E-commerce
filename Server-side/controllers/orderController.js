@@ -64,9 +64,7 @@ const getOrderById = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Update order to paid
-// @route   PUT /api/orders/:id/pay
-// @access  Private
+
 const updateOrderToPaid = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
 
@@ -143,6 +141,27 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   }
 });
 
+const cancelOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Check if the logged-in user owns this order
+    if (order.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ message: "Not authorized to cancel this order" });
+    }
+
+    await order.remove();
+
+    res.json({ message: "Order cancelled successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error while cancelling order" });
+  }
+};
+
 export {
   createOrder,
   getOrderById,
@@ -151,4 +170,6 @@ export {
   getMyOrders,
   getOrders,
   updateOrderStatus,
+  cancelOrder,
 };
+

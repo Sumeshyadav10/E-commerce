@@ -7,7 +7,7 @@ const orderSchema = new mongoose.Schema(
     orderID: {
       type: String,
       unique: true, // Ensure uniqueness
-      default: () => uuidv4(), // Generate a unique order ID
+      default: () => uuidv4(), 
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,

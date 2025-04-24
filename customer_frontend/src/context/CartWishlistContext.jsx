@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import axiosInstance from '../api/axiosInstance'
 
 // Create the context
 const CartWishlistContext = createContext();
@@ -8,36 +9,80 @@ export const CartWishlistProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [wishlistItems, setWishlistItems] = useState([]);
 
+  const fetchCartAndWishlist = async () => {
+    try {
+      const { data } = await axiosInstance.get("/users/me");
+  
+      // Map cart items with all product details
+      setCartItems(
+        (data.cart || []).map((item) => ({
+          productId: item.product._id,
+          name: item.name,
+          price: item.price,
+          image: item.image,
+          dimensions: item.dimensions,
+          quantity: item.quantity,
+        }))
+      );
+  
+      setWishlistItems(data.wishlist || []);
+    } catch (error) {
+      console.error("Error fetching cart and wishlist:", error.response?.data?.message || error.message);
+    }
+  };
+  const syncCartWithBackend = async (cart) => {
+    try {
+      await axiosInstance.put("/users/cart", { cart });
+    } catch (error) {
+      console.error("Error syncing cart:", error.response?.data?.message || error.message);
+    }
+  };
+  
+  const syncWishlistWithBackend = async (wishlist) => {
+    try {
+      await axiosInstance.put("/users/wishlist", { wishlist });
+    } catch (error) {
+      console.error("Error syncing wishlist:", error.response?.data?.message || error.message);
+    }
+  };
   // Add to Cart
   const addToCart = (product) => {
     setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item._id === product._id);
+      const existingItem = prevItems.find((item) => item.product === product._id);
       if (existingItem) {
-        return prevItems; // Prevent duplicates
+        return prevItems;
       }
-      return [...prevItems, product];
+      const updatedCart = [...prevItems, { product: product._id, quantity: 1 }];
+      syncCartWithBackend(updatedCart);
+      return updatedCart;
     });
   };
-
-  // Remove from Cart
+  
   const removeFromCart = (productId) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item._id !== productId));
+    setCartItems((prevItems) => {
+      const updatedCart = prevItems.filter((item) => item.product !== productId);
+      syncCartWithBackend(updatedCart);
+      return updatedCart;
+    });
   };
-
-  // Add to Wishlist
+  
   const addToWishlist = (product) => {
     setWishlistItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item._id === product._id);
-      if (existingItem) {
-        return prevItems; // Prevent duplicates
+      if (prevItems.includes(product._id)) {
+        return prevItems;
       }
-      return [...prevItems, product];
+      const updatedWishlist = [...prevItems, product._id];
+      syncWishlistWithBackend(updatedWishlist);
+      return updatedWishlist;
     });
   };
-
-  // Remove from Wishlist
+  
   const removeFromWishlist = (productId) => {
-    setWishlistItems((prevItems) => prevItems.filter((item) => item._id !== productId));
+    setWishlistItems((prevItems) => {
+      const updatedWishlist = prevItems.filter((id) => id !== productId);
+      syncWishlistWithBackend(updatedWishlist);
+      return updatedWishlist;
+    });
   };
 
   return (
@@ -49,6 +94,7 @@ export const CartWishlistProvider = ({ children }) => {
         removeFromCart,
         addToWishlist,
         removeFromWishlist,
+        fetchCartAndWishlist,
       }}
     >
       {children}

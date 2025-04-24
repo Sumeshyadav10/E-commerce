@@ -16,6 +16,8 @@ const WishlistPage = () => {
     navigate(`/category/${product.category}`, { state: { product } });
   };
 
+  
+
   return (
     <div
       className={`min-h-screen px-4 py-10 flex flex-col items-center justify-start ${

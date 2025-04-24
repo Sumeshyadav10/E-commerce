@@ -8,6 +8,7 @@ const CartPage = () => {
   const { darkMode } = useTheme();
   const navigate = useNavigate();
 
+
   // State to track quantities for each product
   const [quantities, setQuantities] = useState(
     cartItems.reduce((acc, item) => {
@@ -50,6 +51,7 @@ const CartPage = () => {
       [productId]: Math.max((prevQuantities[productId] || 1) - 1, 1), // Ensure quantity is at least 1
     }));
   };
+  
 
   return (
     <div
@@ -71,75 +73,51 @@ const CartPage = () => {
         ) : (
           <>
             <ul className="space-y-4 mb-6">
-              {cartItems.map((item, index) => (
-                <li
-                  key={index}
-                  className={`p-4 rounded-lg shadow cursor-pointer ${
-                    darkMode ? "bg-[#2a2a2a]" : "bg-gray-50"
-                  }`}
-                  onClick={() => handleCardClick(item)} // Navigate to category page
-                >
-                  <div className="flex items-center space-x-4">
-                    <img
-                      src={item.image[0]}
-                      alt={item.name}
-                      className="h-16 w-16 object-cover rounded"
-                    />
-                    <div>
-                      <h3 className="font-semibold">{item.name}</h3>
-                      <p className="text-sm text-gray-400">
-                        Price: ₹{item.price}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        Dimensions: {item.dimensions}
-                      </p>
-                      <div className="mt-2 flex items-center space-x-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevent card click
-                            decrementQuantity(item._id);
-                          }}
-                          className="px-2 py-1 bg-blue-600 rounded hover:bg-blue-600"
-                        >
-                          -
-                        </button>
-                        <span className="w-8 text-center">{quantities[item._id]}</span>
-
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevent card click
-                            incrementQuantity(item._id);
-                          }}
-                          className="px-2 py-1 bg-blue-600 rounded hover:bg-blue-600"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-4 flex justify-between items-center">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent card click
-                        removeFromCart(item._id);
-                      }}
-                      className="text-sm text-red-500 hover:underline"
-                    >
-                      Remove
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent card click
-                        handleBuyNow();
-                      }}
-                      className="text-sm bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                    >
-                      Buy Now
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
+  {cartItems.map((item, index) => (
+    <li
+      key={index}
+      className={`p-4 rounded-lg shadow cursor-pointer ${
+        darkMode ? "bg-[#2a2a2a]" : "bg-gray-50"
+      }`}
+    >
+      <div className="flex items-center space-x-4">
+        <img
+          src={item.image && item.image[0] ? item.image[0] : "/path/to/default-image.jpg"}
+          alt={item.name || "Product Image"}
+          className="h-16 w-16 object-cover rounded"
+        />
+        <div>
+          <h3 className="font-semibold">{item.name}</h3>
+          <p className="text-sm text-gray-400">Price: ₹{item.price}</p>
+          <p className="text-sm text-gray-400">Dimensions: {item.dimensions}</p>
+          <div className="mt-2 flex items-center space-x-2">
+            <button
+              onClick={() => decrementQuantity(item.productId)}
+              className="px-2 py-1 bg-blue-600 rounded hover:bg-blue-600"
+            >
+              -
+            </button>
+            <span className="w-8 text-center">{item.quantity}</span>
+            <button
+              onClick={() => incrementQuantity(item.productId)}
+              className="px-2 py-1 bg-blue-600 rounded hover:bg-blue-600"
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className="mt-4 flex justify-between items-center">
+        <button
+          onClick={() => removeFromCart(item.productId)}
+          className="text-sm text-red-500 hover:underline"
+        >
+          Remove
+        </button>
+      </div>
+    </li>
+  ))}
+</ul>
 
             <div className="text-right text-xl font-semibold">
               Total: ₹{totalAmount.toFixed(2)}

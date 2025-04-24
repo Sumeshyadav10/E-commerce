@@ -7,6 +7,8 @@ import {
   getMyOrders,
   getOrders,
   updateOrderStatus,
+  cancelOrder,
+
 } from "../controllers/orderController.js";
 import { authMiddleware, admin } from "../middleware/authMiddleware.js";
 
@@ -25,9 +27,12 @@ router
   .put(authMiddleware, admin, updateOrderStatus);
 
 router.route("/:id/pay").put(authMiddleware, updateOrderToPaid);
+router.delete("/:id", authMiddleware, cancelOrder);
 
 router
   .route("/:id/deliver")
-  .put(authMiddleware, admin, updateOrderToDelivered);
+  .put(authMiddleware, admin, updateOrderToDelivered)
+
+
 
 export default router;
