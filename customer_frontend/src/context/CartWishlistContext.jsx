@@ -9,23 +9,35 @@ export const CartWishlistProvider = ({ children }) => {
   const [wishlistItems, setWishlistItems] = useState([]);
 
   // Add to Cart
-  const addToCart = (item) => {
-    setCartItems((prev) => [...prev, item]);
+  const addToCart = (product) => {
+    setCartItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item._id === product._id);
+      if (existingItem) {
+        return prevItems; // Prevent duplicates
+      }
+      return [...prevItems, product];
+    });
   };
 
   // Remove from Cart
-  const removeFromCart = (itemId) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== itemId));
+  const removeFromCart = (productId) => {
+    setCartItems((prevItems) => prevItems.filter((item) => item._id !== productId));
   };
 
   // Add to Wishlist
-  const addToWishlist = (item) => {
-    setWishlistItems((prev) => [...prev, item]);
+  const addToWishlist = (product) => {
+    setWishlistItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item._id === product._id);
+      if (existingItem) {
+        return prevItems; // Prevent duplicates
+      }
+      return [...prevItems, product];
+    });
   };
 
   // Remove from Wishlist
-  const removeFromWishlist = (itemId) => {
-    setWishlistItems((prev) => prev.filter((item) => item.id !== itemId));
+  const removeFromWishlist = (productId) => {
+    setWishlistItems((prevItems) => prevItems.filter((item) => item._id !== productId));
   };
 
   return (

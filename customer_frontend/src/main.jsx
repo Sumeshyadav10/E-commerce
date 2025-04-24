@@ -15,6 +15,7 @@ import CartPage from "./pages/CartPage";
 import HelpPage from "./pages/HelpPage";
 import SendMessagePage from "./pages/sendmessage_pages/SendMessagePage.jsx";
 import CategoryPage from "./pages/category_pages/CategoryPage.jsx"; // Import CategoryPage
+import BuyProductPage from "./pages/BuyProductPage.jsx"; // Import BuyProductPage
 import "./index.css";
 import { AuthProvider } from "./context/AuthContext.jsx";
 
@@ -39,7 +40,9 @@ const Main = () => {
                 <Route path="help" element={<HelpPage />} />
                 <Route path="send-message" element={<SendMessagePage />} />
                 {/* Add route for CategoryPage */}
-                <Route path="category/:category" element={<CategoryPage />} />
+                {/* <Route path="category/:category" element={<CategoryPage />} /> */}
+                <Route path="/category/:category" element={<CategoryPage />} />
+                <Route path="/buy-product" element={<BuyProductPage />} />
               </Route>
             </Routes>
           </Router>

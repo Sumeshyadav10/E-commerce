@@ -13,7 +13,12 @@ const userSchema = mongoose.Schema(
     },
     isActive: { type: Boolean, default: true },
     isAdmin: { type: Boolean, required: true, default: false },
-    address: { type: String },
+    address: {
+      address: { type: String, required: true },
+      city: { type: String, required: true },
+      postalCode: { type: String, required: true },
+      country: { type: String, required: true },
+    },
     phoneNumber: { type: String },
   },
   { timestamps: true }

@@ -1,20 +1,22 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext'; // Use the custom hook from ThemeContext
+import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext'; // Custom theme hook
 
 const categories = [
-  { name: 'Household Wires', image: '/voltvision-images/images/wire.png' },
-  { name: 'Industrial cables', image: '/voltvision-images/images/cables.png' },
-  { name: 'SwitchGear', image: '/voltvision-images/images/light-switch.png' },
-  { name: 'Circuit protectors', image: '/voltvision-images/images/breaker.png' },
-  { name: 'Hand Tools', image: '/voltvision-images/images/screwdriver.png' },
-  { name: 'Solar Panel', image: '/voltvision-images/images/solar-panel.png' },
-  { name: 'Power Tools', image: '/voltvision-images/images/drill.png' },
+  { name: 'Household Wires', slug: 'household-wires', image: '/voltvision-images/images/wire.png' },
+  { name: 'Industrial cables', slug: 'Industrial-cables', image: '/voltvision-images/images/cables.png' },
+  { name: 'SwitchGear', slug: 'switchgear', image: '/voltvision-images/images/light-switch.png' },
+  { name: 'Circuit protectors', slug: 'circuit-protectors', image: '/voltvision-images/images/breaker.png' },
+  { name: 'Hand Tools', slug: 'hand-tools', image: '/voltvision-images/images/screwdriver.png' },
+  { name: 'Solar Panel', slug: 'solar-panel', image: '/voltvision-images/images/solar-panel.png' },
+  { name: 'Power Tools', slug: 'Powertools', image: '/voltvision-images/images/drill.png' },
 ];
 
 const ShopByCategory = () => {
-  const { darkMode } = useTheme(); // Access darkMode from ThemeContext
+  const { darkMode } = useTheme();
   const scrollRef = useRef(null);
+  const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -43,13 +45,17 @@ const ShopByCategory = () => {
     });
   };
 
+  const handleCategoryClick = (slug, idx) => {
+    setActiveIndex(idx);
+    navigate(`/category/${slug}`);
+  };
+
   return (
     <section className={`py-10 px-4 md:px-16 relative ${darkMode ? 'bg-[#1e1e1e]' : 'bg-gray-100'}`}>
       <h2 className={`text-3xl md:text-4xl font-bold text-center mb-10 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
         SHOP BY CATEGORY
       </h2>
 
-      {/* Left Arrow */}
       {canScrollLeft && (
         <button
           onClick={() => scroll('left')}
@@ -60,7 +66,6 @@ const ShopByCategory = () => {
         </button>
       )}
 
-      {/* Right Arrow */}
       {canScrollRight && (
         <button
           onClick={() => scroll('right')}
@@ -71,15 +76,14 @@ const ShopByCategory = () => {
         </button>
       )}
 
-      {/* Category Cards */}
       <div
         ref={scrollRef}
         className="flex overflow-x-auto no-scrollbar space-x-6 px-6 md:justify-center"
       >
         {categories.map((cat, idx) => (
           <div
-            key={cat.name}
-            onClick={() => setActiveIndex(idx)}
+            key={cat.slug}
+            onClick={() => handleCategoryClick(cat.slug, idx)}
             className={`min-w-[150px] max-w-[150px] h-48 flex-shrink-0 cursor-pointer p-4 rounded-md shadow-md transition-all duration-300 flex flex-col justify-between items-center
               ${
                 activeIndex === idx

@@ -2,6 +2,7 @@ import express from "express";
 import {
   getProducts,
   getProductById,
+  getProductsByCategory,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -57,6 +58,7 @@ router
     updateProduct
   )
   .delete(authMiddleware, admin, deleteProduct);
+  router.route("/category/:category").get(getProductsByCategory);
 
 router.route("/:id/reviews").post(authMiddleware, createProductReview);
 

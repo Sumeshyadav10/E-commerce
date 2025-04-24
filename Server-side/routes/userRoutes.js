@@ -7,6 +7,7 @@ import {
   getAllUsers,
   getUserById,
   updateUser,
+  updateAddress,
   deleteUser,
 } from "../controllers/userController.js";
 import {
@@ -27,6 +28,7 @@ router.post("/login", loginUser);
 router.post("/logout", authMiddleware, logoutUser);
 router.get("/all", authMiddleware, getAllUsers); // Get all users
 router.get("/me", authMiddleware, getUsers);
+router.put("/address", authMiddleware, updateAddress);
 
 
 router

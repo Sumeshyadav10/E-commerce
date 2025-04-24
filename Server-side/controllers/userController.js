@@ -165,6 +165,29 @@ const updateUser= asyncHandler(async (req, res) => {
   });
 });
 
+const updateAddress = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  const { address, city, postalCode, country } = req.body;
+
+  // Update the address fields
+  user.address = { address, city, postalCode, country };
+
+  const updatedUser = await user.save();
+
+  res.json({
+    _id: updatedUser._id,
+    name: updatedUser.name,
+    email: updatedUser.email,
+    address: updatedUser.address,
+  });
+});
+
 // @desc    Delete user
 // @route   DELETE /api/users/:id
 // @access  Private/Admin
@@ -205,6 +228,7 @@ export {
   getAllUsers,
   getUserById,
   updateUser,
+  updateAddress,
   deleteUser,
   logoutUser,
   getProfile,

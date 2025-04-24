@@ -43,6 +43,21 @@ const getProductById = asyncHandler(async (req, res) => {
   }
 });
 
+const getProductsByCategory = asyncHandler(async (req, res) => {
+  const category = req.params.category;
+
+  try {
+    const products = await Product.find({ category });
+    if (products.length === 0) {
+      res.status(404).json({ message: "No products found in this category" });
+    } else {
+      res.json(products);
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching products by category" });
+  }
+});
+
 // @desc    Create a product
 // @route   POST /api/products
 // @access  Private/Admin
@@ -182,6 +197,7 @@ const createProductReview = asyncHandler(async (req, res) => {
 export {
   getProducts,
   getProductById,
+  getProductsByCategory,
   createProduct,
   updateProduct,
   deleteProduct,
