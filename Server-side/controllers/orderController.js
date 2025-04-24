@@ -1,49 +1,50 @@
 import asyncHandler from "express-async-handler";
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
+import User from "../models/userModel.js";
 
 // @desc    Create new order
 // @route   POST /api/orders
 // @access  Private
 const createOrder = asyncHandler(async (req, res) => {
-  const {
+  const { orderItems, paymentMethod, itemsPrice, shippingPrice, totalPrice } = req.body;
+
+  if (!orderItems || orderItems.length === 0) {
+    res.status(400);
+    throw new Error("No order items");
+  }
+
+  // Fetch the user's address from the database
+  const user = await User.findById(req.user._id);
+  if (!user || !user.address) {
+    res.status(400);
+    throw new Error("User address not found");
+  }
+  console.log("creating order", req.user); // Debugging line
+  const shippingAddress = user.address; // Use the user's address
+
+  // Update product stock
+  for (const item of orderItems) {
+    const product = await Product.findById(item.product);
+    if (product) {
+      product.stock -= item.quantity;
+      await product.save();
+    }
+  }
+
+  // Create the order
+  const order = new Order({
+    user: req.user._id,
     orderItems,
     shippingAddress,
     paymentMethod,
     itemsPrice,
-    taxPrice,
     shippingPrice,
     totalPrice,
-  } = req.body;
+  });
 
-  if (orderItems && orderItems.length === 0) {
-    res.status(400);
-    throw new Error("No order items");
-    return;
-  } else {
-    // Update product stock
-    for (const item of orderItems) {
-      const product = await Product.findById(item.product);
-      if (product) {
-        product.stock -= item.quantity;
-        await product.save();
-      }
-    }
-
-    const order = new Order({
-      user: req.user._id,
-      orderItems,
-      shippingAddress,
-      paymentMethod,
-      itemsPrice,
-      taxPrice,
-      shippingPrice,
-      totalPrice,
-    });
-
-    const createdOrder = await order.save();
-    res.status(201).json(createdOrder);
-  }
+  const createdOrder = await order.save();
+  res.status(201).json(createdOrder);
 });
 
 // @desc    Get order by ID
