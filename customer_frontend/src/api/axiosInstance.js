@@ -1,7 +1,7 @@
-import axios from 'axios';
+import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5000/api', // your backend API base
+  baseURL: "https://e-commerce-render-kjjo.onrender.com/api", // your backend API base
   withCredentials: true, // if using cookies/sessions
 });
 
