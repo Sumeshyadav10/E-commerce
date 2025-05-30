@@ -118,5 +118,6 @@ export const deleteMessage = (id) => api.delete(`/messages/${id}`);
 export const getUnreadCount = () => api.get("/messages/unread/count");
 
 export const creatadmin = (adminData) => api.post("/users", adminData);
+export const getsummary = (name, price, dimension, category) => api.post("/gemini/createsummary",{name, price, dimension, category})
 
 export default api;

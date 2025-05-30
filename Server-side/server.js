@@ -5,6 +5,8 @@ import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+import geminiroutes from "./routes/geminiroutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -27,7 +29,7 @@ app.use(
     origin:
       process.env.NODE_ENV === "production"
         ? "https://admin-panel-1-rele.onrender.com"
-        : "http://localhost:5173",
+        : ["http://localhost:5173", "http://localhost:5174"],
     credentials: true,
   })
 );
@@ -37,6 +39,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use("/api/gemini", geminiroutes);
 
 // Serve static files in production
 if (process.env.NODE_ENV === "production") {
